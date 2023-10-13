@@ -41,6 +41,22 @@ android {
 }
 
 dependencies {
+    //Lifecycle
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.2")
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.2")
+
+    //Retrofit2
+    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
+
+    //OKHTTP3
+    implementation("com.squareup.okhttp3:logging-interceptor:4.7.2")
+    implementation("com.squareup.okhttp3:okhttp:4.10.0")
+
+    //Picasso
+    implementation ("com.squareup.picasso:picasso:2.71828")
+
+
 
     implementation("androidx.core:core-ktx:1.12.0")
     implementation("androidx.appcompat:appcompat:1.6.1")

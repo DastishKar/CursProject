@@ -1,4 +1,5 @@
 package com.example.cursproject.data
 
-class Users {
-}
+data class Users(
+    val users: MutableList<Map<String, String>>
+)
