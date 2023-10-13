@@ -11,5 +11,7 @@ data class UserData(
     val email: String,
     val username: String,
     val password: String,
-    val address: Address
+    val address: Address,
+    val birthDay: String,
+    val token: String?
 )
