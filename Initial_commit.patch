@@ -1,0 +1,14 @@
+Subject: [PATCH] Initial commit
+---
+Index: .gitattributes
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.gitattributes b/.gitattributes
+new file mode 100644
+--- /dev/null	(revision 5b5da6e62863812fae9d75a07d9b54f91f63e430)
++++ b/.gitattributes	(revision 5b5da6e62863812fae9d75a07d9b54f91f63e430)
+@@ -0,0 +1,2 @@
++# Auto detect text files and perform LF normalization
++* text=auto
