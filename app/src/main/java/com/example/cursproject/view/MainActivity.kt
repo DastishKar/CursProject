@@ -1,4 +1,4 @@
-package com.example.cursproject
+package com.example.cursproject.view
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
