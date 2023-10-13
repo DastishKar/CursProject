@@ -148,7 +148,7 @@ class MainActivity : AppCompatActivity() {
         mainApi = retrofit.create(MainApi::class.java)
 
         CoroutineScope(Dispatchers.IO).launch {
-            val list = mainApi.getAllUsers()
+            val list = mainApi.getAllUsers(token = "token")
             runOnUiThread {
                 binding.apply {
                     adapter.submitList(list.users)
