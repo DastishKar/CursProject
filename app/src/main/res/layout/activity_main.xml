@@ -59,12 +59,11 @@
         android:layout_height="wrap_content"
         android:hint="Введите количество"
         android:layout_marginTop="16dp"
-        android:inputType="number"
+        android:inputType="numberDecimal"
         android:textSize="20sp"
         app:layout_constraintTop_toBottomOf="@+id/categorySpinner"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:autofillHints="postalCode" />
+        app:layout_constraintEnd_toEndOf="parent"/>
 
     <!-- Кнопка для сохранения данных -->
     <Button

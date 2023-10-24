@@ -1,14 +1,14 @@
 package com.example.cursproject.view
 
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
+import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import com.example.cursproject.data.AuthRequest
+import com.example.cursproject.data.auth.AuthRequest
 import com.example.cursproject.databinding.ActivityAuthBinding
-import com.example.cursproject.mainInterface.MainApi
+import com.example.cursproject.retrofit.MainApi
 import com.example.cursproject.viewModel.AuthViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -27,6 +27,7 @@ class AuthActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityAuthBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
         initRetrofit()
         viewModel = ViewModelProvider(this@AuthActivity)[AuthViewModel::class.java]
 
@@ -63,7 +64,7 @@ class AuthActivity : AppCompatActivity() {
             .build()
 
         val retrofit = Retrofit.Builder()
-            .baseUrl("https://dummyjson.com/").client(client)
+            .baseUrl("https://65324f5bd80bd20280f54f5c.mockapi.io/karbayevd/api/users/").client(client)
             .addConverterFactory(GsonConverterFactory.create()).build()
         mainApi = retrofit.create(MainApi::class.java)
 

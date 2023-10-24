@@ -7,7 +7,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.cursproject.R
-import com.example.cursproject.data.UserData
+import com.example.cursproject.data.list.UserData
 import com.example.cursproject.databinding.LayoutListViewBinding
 
 class MainAdapter: ListAdapter<UserData, MainAdapter.Holder>(Comparator()) {
@@ -15,9 +15,9 @@ class MainAdapter: ListAdapter<UserData, MainAdapter.Holder>(Comparator()) {
         private val binding = LayoutListViewBinding.bind(view)
 
         fun bind(userData: UserData) = with(binding){
-            cityTextView.text = userData.address.city
-            dateTextView.text = userData.birthDay
-            ageTextView.text = userData.age.toString()
+            cityTextView.text = userData.city
+            dateTextView.text = userData.date
+            quantityTextView.text = userData.quantity.toString()
         }
     }
     class Comparator: DiffUtil.ItemCallback<UserData>(){
@@ -39,4 +39,5 @@ class MainAdapter: ListAdapter<UserData, MainAdapter.Holder>(Comparator()) {
     override fun onBindViewHolder(holder: Holder, position: Int) {
         holder.bind(getItem(position))
     }
+
 }

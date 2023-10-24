@@ -1,18 +1,20 @@
 package com.example.cursproject.view
 
 import android.app.DatePickerDialog
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.DatePicker
+import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.cursproject.adapter.MainAdapter
+import com.example.cursproject.data.list.UserData
 import com.example.cursproject.databinding.ActivityMainBinding
-import com.example.cursproject.mainInterface.MainApi
+import com.example.cursproject.retrofit.MainApi
 import com.example.cursproject.viewModel.MainViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -21,7 +23,6 @@ import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import retrofit2.create
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
@@ -32,7 +33,6 @@ class MainActivity : AppCompatActivity() {
     private lateinit var mainApi: MainApi
     private lateinit var datePickerDialog: DatePickerDialog
     private lateinit var viewModel: MainViewModel
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
@@ -40,13 +40,14 @@ class MainActivity : AppCompatActivity() {
 
         viewModel = ViewModelProvider(this)[MainViewModel::class.java]
 
-
         initRetrofit()
         initRecycler()
         viewModelFun()
+
+
         binding.apply {
             categorySpinner.onItemSelectedListener =
-                object : AdapterView.OnItemSelectedListener{
+                object : AdapterView.OnItemSelectedListener {
                     override fun onItemSelected(
                         parent: AdapterView<*>?,
                         view: View?,
@@ -60,8 +61,21 @@ class MainActivity : AppCompatActivity() {
                     override fun onNothingSelected(parent: AdapterView<*>?) {
                         TODO("Not yet implemented")
                     }
-
                 }
+//                FirebaseInstamnceId.getInstance().instanceId
+//                    .addOnCompleteListener(OnCompleteListener { task ->
+//                        if (!task.isSuccessful) {
+//                            Log.w(TAG, "getInstanceId failed", task.exception)
+//                            return@OnCompleteListener
+//                        }
+//
+//                        // Получите токен устройства
+//                        val token = task.result?.toString()
+//
+//                        // Отправьте этот токен на ваш сервер, например, через сетевой запрос с использованием Retrofit.
+//                        // Вы также можете хранить этот токен локально, чтобы его можно было использовать для отправки уведомлений на это устройство в будущем.
+//                    })
+
 
         }
         fun showDatePicker() {
@@ -95,8 +109,15 @@ class MainActivity : AppCompatActivity() {
             calendarButton.setOnClickListener {
                 showDatePicker()
             }
-
+            getAllUsers()
             saveButton.setOnClickListener {
+                val selectedCity = categorySpinner.selectedItem.toString()
+                val selectedDate = dateTextView.text.toString()
+                val quantityText = quantityEditText.text.toString()
+                val userData = UserData("", quantityText.toInt(), selectedDate, selectedCity)
+                addNewUser(userData)
+
+//                updateUserData(userId = "", updatedUserData = userData)
 
             }
         }
@@ -104,9 +125,8 @@ class MainActivity : AppCompatActivity() {
     }
 
 
-
-    private fun viewModelFun(){
-        viewModel.city.observe(this@MainActivity, Observer{cities ->
+    private fun viewModelFun() {
+        viewModel.city.observe(this@MainActivity, Observer { cities ->
             val adapter = ArrayAdapter(
                 this@MainActivity,
                 android.R.layout.simple_spinner_item,
@@ -119,13 +139,10 @@ class MainActivity : AppCompatActivity() {
         viewModel.selectedDate.observe(this@MainActivity, Observer { selectedDate ->
             "Выбранная дата: ${selectedDate.also { binding.dateTextView.text = it }}"
         })
-
-
     }
 
 
-
-    private fun initRecycler(){
+    private fun initRecycler() {
         binding.apply {
             adapter = MainAdapter()
             recyclerView.layoutManager = LinearLayoutManager(this@MainActivity)
@@ -133,7 +150,8 @@ class MainActivity : AppCompatActivity() {
 
         }
     }
-    private fun initRetrofit(){
+
+    private fun initRetrofit() {
         val interceptor = HttpLoggingInterceptor()
         interceptor.level = HttpLoggingInterceptor.Level.BODY
 
@@ -142,19 +160,81 @@ class MainActivity : AppCompatActivity() {
             .build()
 
         val retrofit = Retrofit.Builder()
-            .baseUrl("https://dummyjson.com").client(client)
+            .baseUrl("https://65324f5bd80bd20280f54f5c.mockapi.io/karbayevd/api/users/")
+            .client(client)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
         mainApi = retrofit.create(MainApi::class.java)
-
+    }
+    private fun getAllUsers() {
         CoroutineScope(Dispatchers.IO).launch {
-            val list = mainApi.getAllUsers(token = "token")
-            runOnUiThread {
-                binding.apply {
-                    adapter.submitList(list.users)
+            try {
+                val response = mainApi.getAllUsers()
+                if (response.isSuccessful) {
+                    val userList = response.body()
+                    userList?.let {
+                        runOnUiThread {
+                            adapter.submitList(userList)
+                        }
+                    }
+                } else {
+                    Log.e("DebugTag", "Error while fetching data: ${response.message()}")
                 }
+            } catch (e: Exception) {
+                Log.e("DebugTag", "Error while fetching data: ${e.message}")
             }
         }
-
     }
+    private fun addNewUser(userData: UserData) {
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                val token = viewModel.token.value
+                val response = mainApi.getAddUsers(userData, token)
+                if (response.isSuccessful) {
+                    val newUser: UserData? = response.body()
+                    newUser?.let {
+                        runOnUiThread {
+                            val updatedList = adapter.currentList.toMutableList()
+                            updatedList.add(newUser)
+                            adapter.submitList(updatedList)
+                        }
+                    }
+                } else {
+                    Log.e("DebugTag", "Error while adding user: ${response.message()}")
+                }
+            } catch (e: Exception) {
+                Log.e("DebugTag", "Error while adding user: ${e.message}")
+            }
+        }
+    }
+//    Из за того что сервер не поддерживает PATH запрос не удается частично обновлять данные
+//    private fun updateUserData(userId: String, updatedUserData: UserData) {
+//        CoroutineScope(Dispatchers.IO).launch {
+//            try {
+//                val token = viewModel.token.value
+//                val response = mainApi.updateUsers(userId, updatedUserData, token)
+//                if (response.isSuccessful) {
+//                    val updatedUser = response.body()
+//                    updatedUser?.let {
+//                        runOnUiThread {
+//                            val updatedList = adapter.currentList.toMutableList()
+//                            val userIndex = updatedList.indexOfFirst { it.id == userId }
+//                            if (userIndex != -1) {
+//                                updatedList[userIndex] = updatedUser
+//                                adapter.submitList(updatedList)
+//                            }
+//                        }
+//                    }
+//                } else {
+//                    Log.e("DebugTag", "Error while updating user: ${response.message()}")
+//                }
+//            } catch (e: Exception) {
+//                Log.e("DebugTag", "Error while updating user: ${e.message}")
+//            }
+//        }
+//    }
+//
+
+
+
 }

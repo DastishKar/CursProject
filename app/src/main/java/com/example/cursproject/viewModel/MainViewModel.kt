@@ -3,11 +3,14 @@ package com.example.cursproject.viewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.example.cursproject.data.list.UserData
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
 
 class MainViewModel: ViewModel() {
+    val token = MutableLiveData<String>()
+
     private val cities = MutableLiveData<List<String>>()
     val city: LiveData<List<String>> get() = cities
 
@@ -17,7 +20,6 @@ class MainViewModel: ViewModel() {
 
     private val selectedDates = MutableLiveData<String>()
     val selectedDate: LiveData<String> get() = selectedDates
-
 
 
     init {
@@ -32,7 +34,7 @@ class MainViewModel: ViewModel() {
     fun onCitySelected(city: String){
         selectedCities.value = city
     }
-
+    //Добавить обновление списка
     fun onDateSelected(year: Int, month: Int, day: Int) {
         val selectedDate = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault())
             .format(Calendar.getInstance().apply {
@@ -42,6 +44,12 @@ class MainViewModel: ViewModel() {
             }.time)
         selectedDates.value = selectedDate
     }
+
+    fun updateData(){
+
+    }
+
+
 
 
 }

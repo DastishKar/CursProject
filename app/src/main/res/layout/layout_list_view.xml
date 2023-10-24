@@ -22,7 +22,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/category"
+                android:text="@string/city"
                 android:textSize="20sp"
                 android:textColor="@color/black"
                 android:textStyle="bold"/>
@@ -65,16 +65,16 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/age"
+                android:text="@string/quantity"
                 android:textSize="20sp"
                 android:textColor="@color/black"
                 android:textStyle="bold"/>
             <TextView
-                android:id="@+id/ageTextView"
+                android:id="@+id/quantityTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="4dp"
-                android:text="@string/ageText"
+                android:text="@string/number"
                 android:textSize="18sp"
                 android:textColor="@color/black"/>
         </LinearLayout>
