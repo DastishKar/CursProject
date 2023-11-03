@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".view.ServicesActivity">
+
+  <ImageView
+      android:id="@+id/notificationButton"
+      android:layout_width="30dp"
+      android:layout_height="30dp"
+      android:layout_marginBottom="44dp"
+      android:contentDescription="@string/common_google_play_services_notification_ticker"
+      android:src="@drawable/baseline_notifications_24"
+      app:layout_constraintBottom_toTopOf="@+id/Text102"
+      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintStart_toEndOf="@+id/Text102" />
+
+  <Button
+      android:id="@+id/T102"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:text="@string/go"
+      app:layout_constraintBottom_toBottomOf="parent"
+      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintHorizontal_bias="0.498"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintTop_toTopOf="parent"
+      app:layout_constraintVertical_bias="0.275" />
+
+
+  <Button
+      android:id="@+id/T112"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:text="@string/go"
+      app:layout_constraintBottom_toBottomOf="parent"
+      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintHorizontal_bias="0.498"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintTop_toBottomOf="@+id/Text102"
+      app:layout_constraintVertical_bias="0.784" />
+
+  <TextView
+      android:id="@+id/Text102"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_gravity="center"
+      android:text="@string/ambulance"
+      android:textSize="30sp"
+      app:layout_constraintBottom_toTopOf="@+id/T102"
+      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintHorizontal_bias="0.498"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintTop_toTopOf="parent"
+      app:layout_constraintVertical_bias="0.722" />
+
+  <TextView
+      android:id="@+id/Text112"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_gravity="center"
+      android:text="@string/firefighters"
+      android:textSize="30sp"
+      app:layout_constraintBottom_toTopOf="@+id/T112"
+      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintHorizontal_bias="0.501"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintTop_toBottomOf="@+id/T102"
+      app:layout_constraintVertical_bias="0.855" />
+
+  <TextView
+      android:id="@+id/Text103"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_gravity="center"
+      android:text="@string/police"
+      android:textSize="30sp"
+      app:layout_constraintBottom_toTopOf="@+id/T103"
+      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintHorizontal_bias="0.498"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintTop_toBottomOf="@+id/T102"
+      app:layout_constraintVertical_bias="0.654" />
+
+  <Button
+      android:id="@+id/T103"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:text="@string/go"
+      app:layout_constraintBottom_toTopOf="@+id/Text112"
+      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintHorizontal_bias="0.498"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintTop_toTopOf="parent"
+      app:layout_constraintVertical_bias="0.823" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

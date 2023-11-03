@@ -23,11 +23,15 @@ class AuthActivity : AppCompatActivity() {
     private lateinit var mainApi: MainApi
     private lateinit var binding: ActivityAuthBinding
     private lateinit var viewModel: AuthViewModel
+//    private val existingUsers: MutableList<UserData> =
+//        mutableListOf() // Переменная для хранения существующих пользователей
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityAuthBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+//        loadExistingUsers()
         initRetrofit()
         viewModel = ViewModelProvider(this@AuthActivity)[AuthViewModel::class.java]
 
@@ -35,22 +39,21 @@ class AuthActivity : AppCompatActivity() {
             initRetrofit()
         })
 
+
         binding.apply {
             buttonlog.setOnClickListener {
-                auth(
-                    AuthRequest(
-                        username.text.toString(),
-                        password.text.toString()
-                    )
-                )
+                val username = username.text.toString()
+                val password = password.text.toString()
+
+                    // Пользователь не существует, продолжите с авторизацией
+                auth(AuthRequest(username, password))
             }
             selectButton.setOnClickListener {
-                val intent = Intent(this@AuthActivity, MainActivity::class.java)
+                val intent = Intent(this@AuthActivity, ServicesActivity::class.java)
                 startActivity(intent)
                 finish()
             }
         }
-
 
     }
 
@@ -64,7 +67,8 @@ class AuthActivity : AppCompatActivity() {
             .build()
 
         val retrofit = Retrofit.Builder()
-            .baseUrl("https://65324f5bd80bd20280f54f5c.mockapi.io/karbayevd/api/users/").client(client)
+            .baseUrl("https://65324f5bd80bd20280f54f5c.mockapi.io/karbayevd/api/users/")
+            .client(client)
             .addConverterFactory(GsonConverterFactory.create()).build()
         mainApi = retrofit.create(MainApi::class.java)
 
@@ -72,18 +76,21 @@ class AuthActivity : AppCompatActivity() {
 
 
 
+
     private fun auth(authRequest: AuthRequest) {
         CoroutineScope(Dispatchers.IO).launch {
             val response = mainApi.auth(authRequest)
-            val message = response.errorBody()?.string()?.let {
+            val message = response.errorBody()?.string()?.let{
                 JSONObject(it).getString("message")
             }
-            runOnUiThread {
-                binding.error.text = message.toString()
-                val user = response.body()
-                if (user != null) {
-                    binding.selectButton.visibility = View.VISIBLE
-                    viewModel.token.value = user.token
+            if (response.isSuccessful) {
+                runOnUiThread {
+                    binding.error.text = message.toString()
+                    val user = response.body()
+                    if (user != null) {
+                        binding.selectButton.visibility = View.VISIBLE
+                        viewModel.token.value = user.token
+                    }
                 }
             }
         }

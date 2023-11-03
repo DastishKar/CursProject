@@ -10,5 +10,9 @@
     <string name="msg_token_fmt">FCM Registration Token: %1$s</string>
     <string name="quantity">Quantity</string>
     <string name="number">98</string>
+    <string name="police">Police</string>
+    <string name="go">Go</string>
+    <string name="firefighters">Firefighters</string>
+    <string name="ambulance">Ambulance</string>
 
 </resources>

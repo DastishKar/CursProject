@@ -1,14 +1,13 @@
 {
   "project_info": {
-    "project_number": "794125474609",
-    "firebase_url": "https://fair-canto-402302-default-rtdb.firebaseio.com",
-    "project_id": "fair-canto-402302",
-    "storage_bucket": "fair-canto-402302.appspot.com"
+    "project_number": "550941712966",
+    "project_id": "message-1953a",
+    "storage_bucket": "message-1953a.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:794125474609:android:3c58d00244969774ca2e10",
+        "mobilesdk_app_id": "1:550941712966:android:ca26e3f0c03e3de5e66047",
         "android_client_info": {
           "package_name": "com.example.cursproject"
         }
@@ -16,26 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyAc9pNvX9kset8uKi9y8ubFJ7ZL_Rk2zUM"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": []
-        }
-      }
-    },
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:794125474609:android:3c1f01189a94b600ca2e10",
-        "android_client_info": {
-          "package_name": "com.example.retrofit2"
-        }
-      },
-      "oauth_client": [],
-      "api_key": [
-        {
-          "current_key": "AIzaSyAc9pNvX9kset8uKi9y8ubFJ7ZL_Rk2zUM"
+          "current_key": "AIzaSyCztPlvJsPs1QGTnmfGj2nwE9Zd9t_weM0"
         }
       ],
       "services": {

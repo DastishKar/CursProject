@@ -1,5 +1,4 @@
 package com.example.cursproject.view
-
 import android.app.DatePickerDialog
 import android.os.Bundle
 import android.util.Log
@@ -7,15 +6,20 @@ import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.DatePicker
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.cursproject.R
 import com.example.cursproject.adapter.MainAdapter
 import com.example.cursproject.data.list.UserData
 import com.example.cursproject.databinding.ActivityMainBinding
 import com.example.cursproject.retrofit.MainApi
 import com.example.cursproject.viewModel.MainViewModel
+import com.google.android.gms.tasks.OnCompleteListener
+import com.google.firebase.FirebaseApp
+import com.google.firebase.messaging.FirebaseMessaging
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -26,24 +30,28 @@ import retrofit2.converter.gson.GsonConverterFactory
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
+import kotlin.system.exitProcess
+
 
 class MainActivity : AppCompatActivity() {
+    private val TAG = "Token ->"
     private lateinit var binding: ActivityMainBinding
     private lateinit var adapter: MainAdapter
     private lateinit var mainApi: MainApi
     private lateinit var datePickerDialog: DatePickerDialog
     private lateinit var viewModel: MainViewModel
+    private val existingUsers: MutableList<UserData> = mutableListOf()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        viewModel = ViewModelProvider(this)[MainViewModel::class.java]
+        loadExistingUsers()
+        viewModel = ViewModelProvider(this@MainActivity)[MainViewModel::class.java]
 
         initRetrofit()
         initRecycler()
         viewModelFun()
-
 
         binding.apply {
             categorySpinner.onItemSelectedListener =
@@ -62,22 +70,8 @@ class MainActivity : AppCompatActivity() {
                         TODO("Not yet implemented")
                     }
                 }
-//                FirebaseInstamnceId.getInstance().instanceId
-//                    .addOnCompleteListener(OnCompleteListener { task ->
-//                        if (!task.isSuccessful) {
-//                            Log.w(TAG, "getInstanceId failed", task.exception)
-//                            return@OnCompleteListener
-//                        }
-//
-//                        // Получите токен устройства
-//                        val token = task.result?.toString()
-//
-//                        // Отправьте этот токен на ваш сервер, например, через сетевой запрос с использованием Retrofit.
-//                        // Вы также можете хранить этот токен локально, чтобы его можно было использовать для отправки уведомлений на это устройство в будущем.
-//                    })
-
-
         }
+
         fun showDatePicker() {
             val calendar = Calendar.getInstance()
             val year = calendar.get(Calendar.YEAR)
@@ -114,16 +108,18 @@ class MainActivity : AppCompatActivity() {
                 val selectedCity = categorySpinner.selectedItem.toString()
                 val selectedDate = dateTextView.text.toString()
                 val quantityText = quantityEditText.text.toString()
-                val userData = UserData("", quantityText.toInt(), selectedDate, selectedCity)
-                addNewUser(userData)
 
-//                updateUserData(userId = "", updatedUserData = userData)
+                if (userAlreadyExists(username = getAllUsers().toString())) {
+                    // Пользователь с таким логином уже существует, обработайте это
+                    Toast.makeText(this@MainActivity, "Пользователь с таким логином уже существует", Toast.LENGTH_SHORT).show()
+                } else {
+                    val userData = UserData("", "", "", "", quantityText.toDouble(), selectedDate, selectedCity)
+                    addNewUser(userData)
+                }
 
             }
         }
-
     }
-
 
     private fun viewModelFun() {
         viewModel.city.observe(this@MainActivity, Observer { cities ->
@@ -174,7 +170,7 @@ class MainActivity : AppCompatActivity() {
                     val userList = response.body()
                     userList?.let {
                         runOnUiThread {
-                            adapter.submitList(userList)
+                            adapter.submitList(userList.users)
                         }
                     }
                 } else {
@@ -192,7 +188,7 @@ class MainActivity : AppCompatActivity() {
                 val response = mainApi.getAddUsers(userData, token)
                 if (response.isSuccessful) {
                     val newUser: UserData? = response.body()
-                    newUser?.let {
+                    newUser.let {
                         runOnUiThread {
                             val updatedList = adapter.currentList.toMutableList()
                             updatedList.add(newUser)
@@ -207,34 +203,26 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
-//    Из за того что сервер не поддерживает PATH запрос не удается частично обновлять данные
-//    private fun updateUserData(userId: String, updatedUserData: UserData) {
-//        CoroutineScope(Dispatchers.IO).launch {
-//            try {
-//                val token = viewModel.token.value
-//                val response = mainApi.updateUsers(userId, updatedUserData, token)
-//                if (response.isSuccessful) {
-//                    val updatedUser = response.body()
-//                    updatedUser?.let {
-//                        runOnUiThread {
-//                            val updatedList = adapter.currentList.toMutableList()
-//                            val userIndex = updatedList.indexOfFirst { it.id == userId }
-//                            if (userIndex != -1) {
-//                                updatedList[userIndex] = updatedUser
-//                                adapter.submitList(updatedList)
-//                            }
-//                        }
-//                    }
-//                } else {
-//                    Log.e("DebugTag", "Error while updating user: ${response.message()}")
-//                }
-//            } catch (e: Exception) {
-//                Log.e("DebugTag", "Error while updating user: ${e.message}")
-//            }
-//        }
-//    }
-//
+    private fun loadExistingUsers() {
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                val response = mainApi.getAllUsers()
+                if (response.isSuccessful) {
+                    val userList = response.body()
+                    userList?.let {
+                        existingUsers.addAll(userList.users) // Сохраните список существующих пользователей
+                    }
+                } else {
+                    Log.e("DebugTag", "Error while fetching data: ${response.message()}")
+                }
+            } catch (e: Exception) {
+                Log.e("DebugTag", "Error while fetching data: ${e.message}")
+            }
+        }
+    }
 
-
+    private fun userAlreadyExists(username: String): Boolean {
+        return existingUsers.any { it.username == username }
+    }
 
 }
