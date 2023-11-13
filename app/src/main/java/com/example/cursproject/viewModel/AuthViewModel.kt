@@ -6,4 +6,5 @@ import com.example.cursproject.data.auth.Auth
 
 class AuthViewModel: ViewModel() {
     val token = MutableLiveData<String>()
+
 }

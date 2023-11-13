@@ -39,5 +39,13 @@ class MainAdapter: ListAdapter<UserData, MainAdapter.Holder>(Comparator()) {
     override fun onBindViewHolder(holder: Holder, position: Int) {
         holder.bind(getItem(position))
     }
+        fun addItem(userData: UserData) {
+            val currentList = currentList.toMutableList()
+            currentList.add(userData)
+            submitList(currentList)
+        }
+
+
+
 
 }

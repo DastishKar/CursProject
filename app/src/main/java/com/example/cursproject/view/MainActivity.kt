@@ -6,20 +6,15 @@ import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.DatePicker
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.cursproject.R
 import com.example.cursproject.adapter.MainAdapter
 import com.example.cursproject.data.list.UserData
 import com.example.cursproject.databinding.ActivityMainBinding
 import com.example.cursproject.retrofit.MainApi
 import com.example.cursproject.viewModel.MainViewModel
-import com.google.android.gms.tasks.OnCompleteListener
-import com.google.firebase.FirebaseApp
-import com.google.firebase.messaging.FirebaseMessaging
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -30,7 +25,6 @@ import retrofit2.converter.gson.GsonConverterFactory
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
-import kotlin.system.exitProcess
 
 
 class MainActivity : AppCompatActivity() {
@@ -40,13 +34,11 @@ class MainActivity : AppCompatActivity() {
     private lateinit var mainApi: MainApi
     private lateinit var datePickerDialog: DatePickerDialog
     private lateinit var viewModel: MainViewModel
-    private val existingUsers: MutableList<UserData> = mutableListOf()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        loadExistingUsers()
         viewModel = ViewModelProvider(this@MainActivity)[MainViewModel::class.java]
 
         initRetrofit()
@@ -98,25 +90,21 @@ class MainActivity : AppCompatActivity() {
             )
             datePickerDialog.show()
         }
+        getAllUsers()
 
         binding.apply {
+
             calendarButton.setOnClickListener {
                 showDatePicker()
             }
-            getAllUsers()
+
             saveButton.setOnClickListener {
                 val selectedCity = categorySpinner.selectedItem.toString()
                 val selectedDate = dateTextView.text.toString()
                 val quantityText = quantityEditText.text.toString()
 
-                if (userAlreadyExists(username = getAllUsers().toString())) {
-                    // Пользователь с таким логином уже существует, обработайте это
-                    Toast.makeText(this@MainActivity, "Пользователь с таким логином уже существует", Toast.LENGTH_SHORT).show()
-                } else {
-                    val userData = UserData("", "", "", "", quantityText.toDouble(), selectedDate, selectedCity)
-                    addNewUser(userData)
-                }
-
+                val userData = UserData("", "", "", "", quantityText.toDouble(), selectedDate, selectedCity)
+                addNewUser(userData)
             }
         }
     }
@@ -139,6 +127,7 @@ class MainActivity : AppCompatActivity() {
 
 
     private fun initRecycler() {
+
         binding.apply {
             adapter = MainAdapter()
             recyclerView.layoutManager = LinearLayoutManager(this@MainActivity)
@@ -162,6 +151,8 @@ class MainActivity : AppCompatActivity() {
             .build()
         mainApi = retrofit.create(MainApi::class.java)
     }
+
+
     private fun getAllUsers() {
         CoroutineScope(Dispatchers.IO).launch {
             try {
@@ -170,7 +161,7 @@ class MainActivity : AppCompatActivity() {
                     val userList = response.body()
                     userList?.let {
                         runOnUiThread {
-                            adapter.submitList(userList.users)
+                            adapter.submitList(userList)
                         }
                     }
                 } else {
@@ -188,11 +179,12 @@ class MainActivity : AppCompatActivity() {
                 val response = mainApi.getAddUsers(userData, token)
                 if (response.isSuccessful) {
                     val newUser: UserData? = response.body()
-                    newUser.let {
+                    newUser?.let {
                         runOnUiThread {
-                            val updatedList = adapter.currentList.toMutableList()
-                            updatedList.add(newUser)
-                            adapter.submitList(updatedList)
+                            adapter.addItem(newUser)
+                            val position = adapter.currentList.indexOf(newUser)
+                            adapter.notifyItemChanged(position)
+                            Log.d("DebugTag", "Added new user: $userData")
                         }
                     }
                 } else {
@@ -203,26 +195,4 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
-    private fun loadExistingUsers() {
-        CoroutineScope(Dispatchers.IO).launch {
-            try {
-                val response = mainApi.getAllUsers()
-                if (response.isSuccessful) {
-                    val userList = response.body()
-                    userList?.let {
-                        existingUsers.addAll(userList.users) // Сохраните список существующих пользователей
-                    }
-                } else {
-                    Log.e("DebugTag", "Error while fetching data: ${response.message()}")
-                }
-            } catch (e: Exception) {
-                Log.e("DebugTag", "Error while fetching data: ${e.message}")
-            }
-        }
-    }
-
-    private fun userAlreadyExists(username: String): Boolean {
-        return existingUsers.any { it.username == username }
-    }
-
 }

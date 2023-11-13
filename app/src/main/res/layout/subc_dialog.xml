@@ -7,57 +7,111 @@
     android:background="@drawable/rounded_background"
     android:layout_marginTop="50dp">
 
-
-    <!-- Добавьте здесь элементы интерфейса, такие как текст, кнопки и др. -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:gravity="center">
 
-
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Хотите подписаться на новости  "
+            android:text="Хотите подписаться \n    на уведомления:  "
+            android:textStyle="normal"
+            android:textColor="@color/black"
             android:layout_gravity="start"
-            android:textSize="15sp"
+            android:textSize="20sp"
             android:layout_marginTop="20dp"/>
 
         <TextView
             android:id="@+id/dialogCity"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="City?"
-            android:layout_gravity="end"
-            android:textSize="15sp"/>
+            android:text="City"
+            android:textSize="20sp"
+            android:textStyle="normal"
+            android:layout_marginLeft="-10dp"
+            android:textColor="@color/black"/>
+
+<!--        <TextView-->
+<!--            android:id="@+id/dialogCity"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:text="City?"-->
+<!--            android:textStyle="normal"-->
+<!--            android:textColor="@color/black"-->
+<!--            android:layout_gravity="end"-->
+<!--            android:textSize="20sp"/>-->
 
 
     </LinearLayout>
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:gravity="start">
 
-        <CheckBox
-            android:id="@+id/topicCheckbox1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Chicago"
-            android:textSize="20sp"/>
-        <CheckBox
-            android:id="@+id/topicCheckbox2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="New-York"
-            android:textSize="20sp"/>
-        <CheckBox
-            android:id="@+id/topicCheckbox3"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Astana"
-            android:textSize="20sp"/>
+<!--        <LinearLayout-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:orientation="horizontal">-->
+
+<!--            <CheckBox-->
+<!--                android:id="@+id/topicCheckbox1"-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"/>-->
+
+<!--            <TextView-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:textSize="20sp"-->
+<!--                android:textStyle="normal"-->
+<!--                android:textColor="@color/black"-->
+<!--                android:text="City1"/>-->
+
+<!--        </LinearLayout>-->
+
+<!--        <LinearLayout-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:orientation="horizontal">-->
+
+<!--            <CheckBox-->
+<!--                android:id="@+id/topicCheckbox2"-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"/>-->
+
+<!--            <TextView-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:text="City2"-->
+<!--                android:textSize="20sp"-->
+<!--                android:textStyle="normal"-->
+<!--                android:textColor="@color/black"/>-->
+
+<!--        </LinearLayout>-->
+
+<!--        <LinearLayout-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:orientation="horizontal">-->
+
+<!--            <CheckBox-->
+<!--                android:id="@+id/topicCheckbox3"-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"/>-->
+
+<!--            <TextView-->
+<!--                android:id="@+id/topic3"-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:textColor="@color/black"-->
+<!--                android:textStyle="normal"-->
+<!--                android:text="City3"-->
+<!--                android:textSize="20sp"/>-->
+<!--        </LinearLayout>-->
+
     </LinearLayout>
 
     <LinearLayout
@@ -79,6 +133,7 @@
             android:layout_height="wrap_content"
             android:text="Отписаться"
             android:layout_marginLeft="15dp"/>
+
     </LinearLayout>
 
 

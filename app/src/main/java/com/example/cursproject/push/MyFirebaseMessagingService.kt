@@ -5,6 +5,7 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.os.Build
 import android.util.Log
 import android.widget.RemoteViews
@@ -39,25 +40,27 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
             Log.d(TAG, "Message data payload: ${remoteMessage.data}")
 
 
-            // Check if message contains a notification payload.
             remoteMessage.notification?.let {
                 Log.d(TAG, "Message Notification Body: ${it.body}")
             }
 
-            // Also if you intend on generating your own notifications as a result of a received FCM
-            // message, here is where that should be initiated. See sendNotification method below.
         }
         if (remoteMessage.notification != null) {
             val title = remoteMessage.notification!!.title!!
             val message = remoteMessage.notification!!.body!!
             generationNotification(title, message)
         }
+
+
+
     }
 
 
     private fun generationNotification(title: String, message: String) {
+        val url = "https://www.google.com/"
 
-        val intent = Intent(this@MyFirebaseMessagingService, ServicesActivity::class.java)
+
+        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
 
         val pendingIntent = PendingIntent.getActivity(
@@ -91,12 +94,4 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
 }
 
 
-//    private fun getUsersInChicagoAndSendNotifications(title: String, message: String) {
-//        // Вызовите метод получения пользователей из города "Chicago" через Retrofit
-//        val retrofit = Retrofit.Builder()
-//            .baseUrl("https://65324f5bd80bd20280f54f5c.mockapi.io/karbayevd/api/users/")
-//            .addConverterFactory(GsonConverterFactory.create())
-//            .build()
-//
-//        val mainApi = retrofit.create(MainApi::class.java)
-//
+

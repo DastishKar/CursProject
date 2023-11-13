@@ -5,127 +5,105 @@ import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.widget.Button
-import android.widget.CheckBox
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.ViewModelProvider
 import com.example.cursproject.R
 import com.example.cursproject.databinding.ActivityServiceBinding
-import com.google.android.gms.tasks.OnCompleteListener
+import com.example.cursproject.viewModel.ServicesViewModel
 import com.google.firebase.messaging.FirebaseMessaging
 
 class ServicesActivity : AppCompatActivity() {
-    private val TAG = " Token"
-    private val checkBoxMap = mutableMapOf<String, CheckBox>()
+    private val TAG = "Token"
+    private lateinit var viewModel: ServicesViewModel
     private lateinit var binding: ActivityServiceBinding
-//    private lateinit var mainApi: MainApi
-//    private lateinit var userSubscribeManager: UserSubscribeManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityServiceBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-//        initRetrofit()
-//        userSubs()
+        viewModel = ViewModelProvider(this).get(ServicesViewModel::class.java)
 
         binding.T102.setOnClickListener {
-            val intent = Intent(this@ServicesActivity, MainActivity::class.java)
-            startActivity(intent)
-            Toast.makeText(this@ServicesActivity, "Вы перешли к скорой", Toast.LENGTH_SHORT).show()
+            navigateToMainActivityWithToast("скорой")
         }
         binding.T103.setOnClickListener {
-            val intent = Intent(this@ServicesActivity, MainActivity::class.java)
-            startActivity(intent)
-            Toast.makeText(this@ServicesActivity, "Вы перешли к пожарным", Toast.LENGTH_SHORT)
-                .show()
+            navigateToMainActivityWithToast("пожарным")
         }
         binding.T112.setOnClickListener {
-            val intent = Intent(this@ServicesActivity, MainActivity::class.java)
-            startActivity(intent)
-            Toast.makeText(this@ServicesActivity, "Вы перешли к полиции", Toast.LENGTH_SHORT).show()
+            navigateToMainActivityWithToast("полиции")
         }
 
-        FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener { task ->
-            if (!task.isSuccessful) {
-                Log.w(TAG, "Fetching FCM registration token failed", task.exception)
-                return@OnCompleteListener
-            }
-            val token = task.result
-            val msg = getString(R.string.msg_token_fmt, token)
-            Log.d(TAG, msg)
-            Toast.makeText(baseContext, msg, Toast.LENGTH_SHORT).show()
-        })
+        val userToken = intent.getStringExtra("userToken")
+        val userId= intent.getStringExtra("userId")
 
+        FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                val token = task.result
+                val msg = getString(R.string.msg_token_fmt, token)
+                Log.d(TAG, msg)
+            } else {
+                Log.w(TAG, "Fetching FCM registration token failed", task.exception)
+            }
+        }
 
         binding.notificationButton.setOnClickListener {
-            val TAG = "Topics notification"
-            val dialogLayout = LayoutInflater.from(this@ServicesActivity)
-                .inflate(R.layout.subc_dialog, null)
-
-            checkBoxMap["Chicago"] = dialogLayout.findViewById(R.id.topicCheckbox1)
-            checkBoxMap["New-York"] = dialogLayout.findViewById(R.id.topicCheckbox2)
-            checkBoxMap["Astana"] = dialogLayout.findViewById(R.id.topicCheckbox3)
-
-            val builder = AlertDialog.Builder(this@ServicesActivity)
-            builder.setView(dialogLayout)
-
-
-            val dialog = builder.create()
-
-            val subscriptionYesButton = dialogLayout.findViewById<Button>(R.id.yesButton)
-            val subscriptionNoButton = dialogLayout.findViewById<Button>(R.id.noButton)
-
-            subscriptionYesButton.setOnClickListener {
-                val topics = listOf("Chicago", "New-York", "Astana")
-
-                for (topic in topics) {
-                    if (isTopicSelected(topic)) {
-                        FirebaseMessaging.getInstance().subscribeToTopic(topic)
-                            .addOnCompleteListener { task ->
-                                val msg = if (task.isSuccessful) {
-                                    "Subscribed to $topic"
-                                } else {
-                                    "Subscribe to $topic failed"
-                                }
-                                Log.d(TAG, msg)
-                                Toast.makeText(baseContext, msg, Toast.LENGTH_SHORT).show()
-                            }
-                    }
+            viewModel.fetchUserCity(userToken.toString(), userId).observe(this) { city ->
+                if (city.isNotEmpty()) {
+                    showSubscriptionDialog(city)
+                } else {
+                    showToast("Failed to get user city")
                 }
-                dialog.dismiss()
             }
-
-            subscriptionNoButton.setOnClickListener {
-                val topics = listOf("Chicago", "New-York", "Astana")
-
-                for (topic in topics) {
-                    if (isTopicSelected(topic)) {
-                        FirebaseMessaging.getInstance().unsubscribeFromTopic(topic)
-                            .addOnCompleteListener { task ->
-                                val msg = if (task.isSuccessful) {
-                                    "Unsubscribed from $topic"
-                                } else {
-                                    "Unsubscribe from $topic failed"
-                                }
-                                Log.d(TAG, msg)
-                                Toast.makeText(baseContext, msg, Toast.LENGTH_SHORT).show()
-                            }
-                    }
-                }
-                dialog.dismiss()
-            }
-            dialog.show()
         }
     }
 
+    private fun navigateToMainActivityWithToast(destination: String) {
+        val intent = Intent(this, MainActivity::class.java)
+        startActivity(intent)
+        showToast("Вы перешли к $destination")
+    }
 
+    private fun showSubscriptionDialog(userCity: String) {
+        val dialogLayout = LayoutInflater.from(this).inflate(R.layout.subc_dialog, null)
+        val cityTextView = dialogLayout.findViewById<TextView>(R.id.dialogCity)
+        cityTextView.text = userCity
 
+        val builder = AlertDialog.Builder(this)
+        builder.setView(dialogLayout)
 
-    private fun isTopicSelected(topic: String): Boolean {
-        val checkBox = checkBoxMap[topic]
-        return checkBox?.isChecked ?: false
+        val dialog = builder.create()
+
+        val subscriptionYesButton = dialogLayout.findViewById<Button>(R.id.yesButton)
+        val subscriptionNoButton = dialogLayout.findViewById<Button>(R.id.noButton)
+
+        subscriptionYesButton.setOnClickListener {
+            subscribeToCityTopic(userCity)
+            showToast("Вы подписались на уведомления по городу $userCity")
+            dialog.dismiss()
+        }
+
+        subscriptionNoButton.setOnClickListener {
+            unsubscribeFromCityTopic(userCity)
+            showToast("Вы отписались на уведомления по городу $userCity")
+            dialog.dismiss()
+        }
+
+        dialog.show()
+    }
+
+    private fun showToast(message: String) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+    }
+
+    private fun subscribeToCityTopic(city: String) {
+        viewModel.subscribeToCityTopic(city)
+    }
+
+    private fun unsubscribeFromCityTopic(city: String) {
+        viewModel.unsubscribeFromCityTopic(city)
     }
 }
-
-
